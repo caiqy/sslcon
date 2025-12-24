@@ -9,7 +9,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/jackpal/gateway v1.1.1
 	github.com/kardianos/service v1.2.4
-	github.com/lysShub/wintun-go v0.0.0-20240606130541-1acbbbe408f3
+	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
 	github.com/pion/dtls/v2 v2.2.8
 	github.com/sourcegraph/jsonrpc2 v0.2.1
 	github.com/spf13/cobra v1.8.0
@@ -44,3 +44,11 @@ require (
 )
 
 replace github.com/kardianos/service v1.2.2 => github.com/cuonglm/service v0.0.0-20230322120818-ee0647d95905
+
+// 强制使用Go 1.20兼容版本，避免传递依赖拉取新版本
+replace (
+	golang.org/x/crypto => golang.org/x/crypto v0.17.0
+	golang.org/x/net => golang.org/x/net v0.19.0
+	golang.org/x/sys => golang.org/x/sys v0.15.0
+	golang.org/x/term => golang.org/x/term v0.15.0
+)

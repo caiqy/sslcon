@@ -1,22 +1,22 @@
 package tun
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
 	"sync"
 	"sync/atomic"
 
-	"github.com/lysShub/wintun-go"
 	"golang.org/x/sys/windows"
+	"golang.zx2c4.com/wintun"
 	"golang.zx2c4.com/wireguard/windows/tunnel/winipcfg"
 )
 
 type NativeTun struct {
-	wt   *wintun.Adapter
-	name string
-	mtu  int
+	wt      *wintun.Adapter
+	session wintun.Session
+	name    string
+	mtu     int
 
 	closeOnce sync.Once
 	close     atomic.Bool
@@ -32,23 +32,27 @@ var (
 	}
 )
 
-func init() {
-	wintun.MustLoad(wintun.DLL)
-}
-
 func CreateTUN(ifname string, mtu int) (Device, error) {
-	wt, err := wintun.CreateAdapter(ifname,
-		wintun.TunType(WintunTunnelType),
-		wintun.Guid(WintunStaticRequestedGUID),
-		wintun.RingBuff(0x800000)) // 8 MiB, 5个 0 为 1 MiB
-
-	tun := &NativeTun{
-		wt:   wt,
-		name: ifname,
-		mtu:  mtu,
+	wt, err := wintun.CreateAdapter(ifname, WintunTunnelType, WintunStaticRequestedGUID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create adapter: %w", err)
 	}
 
-	return tun, err
+	// 启动会话，容量 8 MiB (0x800000)
+	session, err := wt.StartSession(0x800000)
+	if err != nil {
+		wt.Close()
+		return nil, fmt.Errorf("failed to start session: %w", err)
+	}
+
+	tun := &NativeTun{
+		wt:      wt,
+		session: session,
+		name:    ifname,
+		mtu:     mtu,
+	}
+
+	return tun, nil
 }
 
 func (tun *NativeTun) File() *os.File {
@@ -56,45 +60,42 @@ func (tun *NativeTun) File() *os.File {
 }
 
 func (tun *NativeTun) Read(buff []byte, offset int) (int, error) {
-
 	if tun.close.Load() {
 		return 0, os.ErrClosed
 	}
 
-	for {
-		packet, err := tun.wt.Recv(context.Background())
-		switch err {
-		case nil:
-			packetSize := len(packet)
-			copy(buff[offset:], packet)
-			tun.wt.Release(packet)
-			// tun.rate.update(uint64(packetSize))
-			return packetSize, nil
-		case windows.ERROR_HANDLE_EOF:
-			return 0, os.ErrClosed
-		case windows.ERROR_INVALID_DATA:
-			return 0, errors.New("send ring corrupt")
-		}
-		return 0, fmt.Errorf("read failed: %w", err)
+retry:
+	packet, err := tun.session.ReceivePacket()
+	switch err {
+	case nil:
+		packetSize := len(packet)
+		copy(buff[offset:], packet)
+		tun.session.ReleaseReceivePacket(packet)
+		return packetSize, nil
+	case windows.ERROR_NO_MORE_ITEMS:
+		// 没有数据包，等待
+		windows.WaitForSingleObject(tun.session.ReadWaitEvent(), windows.INFINITE)
+		goto retry
+	case windows.ERROR_HANDLE_EOF:
+		return 0, os.ErrClosed
+	case windows.ERROR_INVALID_DATA:
+		return 0, errors.New("recv ring corrupt")
 	}
+	return 0, fmt.Errorf("read failed: %w", err)
 }
 
 func (tun *NativeTun) Write(buff []byte, offset int) (int, error) {
-
 	if tun.close.Load() {
 		return 0, os.ErrClosed
 	}
 
 	packetSize := len(buff) - offset
 
-	packet, err := tun.wt.Alloc(packetSize)
+	packet, err := tun.session.AllocateSendPacket(packetSize)
 	if err == nil {
 		copy(packet, buff[offset:])
-		err = tun.wt.Send(packet)
-		if err != nil {
-			return 0, err
-		}
-		return int(packetSize), nil
+		tun.session.SendPacket(packet)
+		return packetSize, nil
 	}
 	switch err {
 	case windows.ERROR_HANDLE_EOF:
@@ -125,6 +126,7 @@ func (tun *NativeTun) Close() error {
 	tun.closeOnce.Do(func() {
 		tun.close.Store(true)
 
+		tun.session.End()
 		if tun.wt != nil {
 			tun.wt.Close()
 		}
@@ -134,9 +136,5 @@ func (tun *NativeTun) Close() error {
 }
 
 func (tun *NativeTun) LUID() winipcfg.LUID {
-	luid, err := tun.wt.GetAdapterLuid()
-	if err != nil {
-		return 0
-	}
-	return luid
+	return winipcfg.LUID(tun.wt.LUID())
 }
