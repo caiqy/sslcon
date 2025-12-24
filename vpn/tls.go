@@ -15,6 +15,9 @@ import (
 // 复用已有的 tls.Conn 和对应的 bufR
 func tlsChannel(conn *tls.Conn, bufR *bufio.Reader, cSess *session.ConnSession, resp *http.Response) {
 	defer func() {
+		if err := recover(); err != nil {
+			base.Error("tlsChannel recovered from panic:", err)
+		}
 		base.Info("tls channel exit")
 		resp.Body.Close()
 		_ = conn.Close()
@@ -79,6 +82,9 @@ func tlsChannel(conn *tls.Conn, bufR *bufio.Reader, cSess *session.ConnSession, 
 // payloadOutTLSToServer Step 4
 func payloadOutTLSToServer(conn *tls.Conn, cSess *session.ConnSession) {
 	defer func() {
+		if err := recover(); err != nil {
+			base.Error("payloadOutTLSToServer recovered from panic:", err)
+		}
 		base.Info("tls payloadOut to server exit")
 		_ = conn.Close()
 		cSess.Close()

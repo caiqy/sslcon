@@ -179,6 +179,12 @@ func (_ *handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2
 }
 
 func monitor() {
+	defer func() {
+		if err := recover(); err != nil {
+			base.Error("monitor recovered from panic:", err)
+		}
+	}()
+
 	// 不考虑 DTLS 中途关闭情形
 	<-session.Sess.CloseChan
 	ctx := context.Background()

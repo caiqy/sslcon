@@ -70,6 +70,11 @@ func (tun *NativeTun) Read(buff []byte, offset int) (int, error) {
 	}
 
 retry:
+	// 检查关闭状态
+	if tun.close.Load() {
+		return 0, os.ErrClosed
+	}
+
 	packet, err := tun.session.ReceivePacket()
 	switch err {
 	case nil:
@@ -78,8 +83,8 @@ retry:
 		tun.session.ReleaseReceivePacket(packet)
 		return packetSize, nil
 	case windows.ERROR_NO_MORE_ITEMS:
-		// 没有数据包，等待
-		windows.WaitForSingleObject(tun.session.ReadWaitEvent(), windows.INFINITE)
+		// 没有数据包，等待 500ms 后重试，避免无限阻塞导致无法响应 Close
+		windows.WaitForSingleObject(tun.session.ReadWaitEvent(), 500)
 		goto retry
 	case windows.ERROR_HANDLE_EOF:
 		return 0, os.ErrClosed

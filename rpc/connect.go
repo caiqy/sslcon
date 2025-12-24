@@ -49,6 +49,13 @@ func SetupTunnel(reconnect bool) error {
 
 // DisConnect 主动断开或者 ctrl+c，不包括网络或tun异常退出
 func DisConnect() {
+	defer func() {
+		if err := recover(); err != nil {
+			// 防止断开连接时的 panic 导致服务退出
+			println("DisConnect recovered from panic:", err)
+		}
+	}()
+
 	session.Sess.ActiveClose = true
 	if session.Sess.CSess != nil {
 		vpnc.ResetRoutes(session.Sess.CSess) // 蛋疼的循环引用

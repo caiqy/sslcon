@@ -23,6 +23,9 @@ func dtlsChannel(cSess *session.ConnSession) {
 		dead          = time.Duration(cSess.DTLSDpdTime+5) * time.Second
 	)
 	defer func() {
+		if err := recover(); err != nil {
+			base.Error("dtlsChannel recovered from panic:", err)
+		}
 		base.Info("dtls channel exit")
 		if conn != nil {
 			_ = conn.Close()
@@ -137,6 +140,9 @@ func dtlsChannel(cSess *session.ConnSession) {
 // payloadOutDTLSToServer Step 4
 func payloadOutDTLSToServer(conn *dtls.Conn, dSess *session.DtlsSession, cSess *session.ConnSession) {
 	defer func() {
+		if err := recover(); err != nil {
+			base.Error("payloadOutDTLSToServer recovered from panic:", err)
+		}
 		base.Info("dtls payloadOut to server exit")
 		_ = conn.Close()
 		dSess.Close()

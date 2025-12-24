@@ -56,6 +56,9 @@ func setupTun(cSess *session.ConnSession) error {
 func tunToPayloadOut(dev tun.Device, cSess *session.ConnSession) {
 	// tun 设备读错误
 	defer func() {
+		if err := recover(); err != nil {
+			base.Error("tunToPayloadOut recovered from panic:", err)
+		}
 		base.Info("tun to payloadOut exit")
 		_ = dev.Close()
 	}()
@@ -106,6 +109,9 @@ func tunToPayloadOut(dev tun.Device, cSess *session.ConnSession) {
 func payloadInToTun(dev tun.Device, cSess *session.ConnSession) {
 	// tun 设备写错误或者cSess.CloseChan
 	defer func() {
+		if err := recover(); err != nil {
+			base.Error("payloadInToTun recovered from panic:", err)
+		}
 		base.Info("payloadIn to tun exit")
 		if !cSess.Sess.ActiveClose {
 			vpnc.ResetRoutes(cSess) // 如果 tun 没有创建成功，也不会调用 SetRoutes
