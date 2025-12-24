@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/pion/dtls/v3/pkg/protocol"
+	"github.com/pion/dtls/v2/pkg/protocol"
 	"sslcon/base"
 	"sslcon/utils/waterutil"
 )

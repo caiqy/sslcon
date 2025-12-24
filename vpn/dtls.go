@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pion/dtls/v3"
+	"github.com/pion/dtls/v2"
 	"sslcon/base"
 	"sslcon/proto"
 	"sslcon/session"
@@ -62,16 +62,11 @@ func dtlsChannel(cSess *session.ConnSession) {
 		// PSKIdentityHint: id,
 	}
 
-	conn, err = dtls.Dial("udp4", addr, config)
-	// https://github.com/pion/dtls/pull/649
-	if err != nil {
-		base.Error(err)
-		close(cSess.DtlsSetupChan) // 没有成功建立 DTLS 隧道
-		return
-	}
+	// v2: Dial 会自动执行握手，使用 DialWithContext 支持超时
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	if err = conn.HandshakeContext(ctx); err != nil {
+	conn, err = dtls.DialWithContext(ctx, "udp4", addr, config)
+	if err != nil {
 		base.Error(err)
 		close(cSess.DtlsSetupChan) // 没有成功建立 DTLS 隧道
 		return
@@ -82,12 +77,9 @@ func dtlsChannel(cSess *session.ConnSession) {
 	close(cSess.DtlsSetupChan) // 成功建立 DTLS 隧道
 
 	// rewrite cSess.DTLSCipherSuite
-	state, success := conn.ConnectionState()
-	if success {
-		cSess.DTLSCipherSuite = dtls.CipherSuiteName(state.CipherSuiteID)
-	} else {
-		cSess.DTLSCipherSuite = ""
-	}
+	// v2: ConnectionState() 返回 State，不返回 bool
+	state := conn.ConnectionState()
+	cSess.DTLSCipherSuite = dtls.CipherSuiteName(state.CipherSuiteID)
 
 	base.Info("dtls channel negotiation succeeded")
 
