@@ -3,21 +3,20 @@ module sslcon
 go 1.20
 
 require (
-	github.com/apieasy/gson v0.2.3
 	github.com/elastic/go-sysinfo v1.11.2
 	github.com/gopacket/gopacket v1.2.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/jackpal/gateway v1.0.15
 	github.com/kardianos/service v1.2.2
-	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
 	github.com/pion/dtls/v2 v2.2.8
 	github.com/sourcegraph/jsonrpc2 v0.2.1
 	github.com/spf13/cobra v1.8.0
 	github.com/vishvananda/netlink v1.2.1-beta.2
 	go.uber.org/atomic v1.11.0
 	golang.org/x/crypto v0.17.0
-	golang.org/x/net v0.19.0
-	golang.org/x/sys v0.17.0
+	golang.org/x/net v0.25.0
+	golang.org/x/sys v0.18.0
+	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
 	golang.zx2c4.com/wireguard/windows v0.5.3
 )
 
@@ -25,18 +24,14 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901 // indirect
 	github.com/pion/logging v0.2.4 // indirect
 	github.com/pion/transport/v2 v2.2.4 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/objx v0.5.1 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
-	github.com/tidwall/gjson v1.17.0 // indirect
-	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tidwall/sjson v1.2.5 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
 	golang.org/x/term v0.17.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

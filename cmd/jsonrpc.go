@@ -2,11 +2,23 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/gorilla/websocket"
 	"github.com/sourcegraph/jsonrpc2"
 	ws "github.com/sourcegraph/jsonrpc2/websocket"
 )
+
+func prettyPrint(data json.RawMessage) {
+	var out []byte
+	out, err := json.MarshalIndent(json.RawMessage(data), "", "  ")
+	if err != nil {
+		fmt.Println(string(data))
+		return
+	}
+	fmt.Println(string(out))
+}
 
 // type handler struct{}
 //

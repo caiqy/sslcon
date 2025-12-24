@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/apieasy/gson"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 	"sslcon/rpc"
@@ -46,8 +46,8 @@ var connect = &cobra.Command{
 				params["log_level"] = logLevel
 				params["log_path"] = logPath
 
-				result := gson.New()
-				err := rpcCall("config", params, result, rpc.CONFIG)
+				var result json.RawMessage
+				err := rpcCall("config", params, &result, rpc.CONFIG)
 				if err != nil {
 					after, _ := strings.CutPrefix(err.Error(), "jsonrpc2: code 1 message: ")
 					fmt.Println(after)
@@ -59,12 +59,12 @@ var connect = &cobra.Command{
 					params["group"] = group
 					params["secret"] = secret
 
-					err := rpcCall("connect", params, result, rpc.CONNECT)
+					err := rpcCall("connect", params, &result, rpc.CONNECT)
 					if err != nil {
 						after, _ := strings.CutPrefix(err.Error(), "jsonrpc2: code 1 message: ")
 						fmt.Println(after)
 					} else {
-						result.Print()
+						prettyPrint(result)
 					}
 				}
 			}
