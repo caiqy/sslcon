@@ -1,6 +1,6 @@
 module sslcon
 
-go 1.24.2
+go 1.20
 
 require (
 	github.com/apieasy/gson v0.2.3
