@@ -33,6 +33,11 @@ var (
 )
 
 func CreateTUN(ifname string, mtu int) (Device, error) {
+	// Extract embedded wintun.dll before use
+	if err := ExtractWintunDLL(); err != nil {
+		return nil, fmt.Errorf("failed to extract wintun.dll: %w", err)
+	}
+
 	wt, err := wintun.CreateAdapter(ifname, WintunTunnelType, WintunStaticRequestedGUID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create adapter: %w", err)
