@@ -10,3 +10,8 @@ test
 vpnagent
 sslcon
 *.exe
+openspec
+.windsurf
+.windsurfrules
+.ask_continue_port
+AGENTS.md
