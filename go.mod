@@ -7,7 +7,7 @@ require (
 	github.com/elastic/go-sysinfo v1.11.2
 	github.com/gopacket/gopacket v1.2.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/jackpal/gateway v1.1.1
+	github.com/jackpal/gateway v1.0.15
 	github.com/kardianos/service v1.2.4
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
 	github.com/pion/dtls/v2 v2.2.8
