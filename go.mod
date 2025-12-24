@@ -42,6 +42,7 @@ replace github.com/kardianos/service v1.2.2 => github.com/cuonglm/service v0.0.0
 
 // 强制使用Go 1.20兼容版本，避免传递依赖拉取新版本
 replace (
+	github.com/jackpal/gateway => github.com/jackpal/gateway v1.0.14
 	golang.org/x/crypto => golang.org/x/crypto v0.17.0
 	golang.org/x/net => golang.org/x/net v0.19.0
 	golang.org/x/sys => golang.org/x/sys v0.15.0
