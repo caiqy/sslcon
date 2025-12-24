@@ -77,9 +77,12 @@ func dtlsChannel(cSess *session.ConnSession) {
 	close(cSess.DtlsSetupChan) // 成功建立 DTLS 隧道
 
 	// rewrite cSess.DTLSCipherSuite
-	// v2: ConnectionState() 返回 State，不返回 bool
-	state := conn.ConnectionState()
-	cSess.DTLSCipherSuite = dtls.CipherSuiteName(state.CipherSuiteID)
+	// v2: State 结构体没有 CipherSuiteID 公开字段，使用配置的 CipherSuites
+	if len(config.CipherSuites) > 0 {
+		cSess.DTLSCipherSuite = dtls.CipherSuiteName(config.CipherSuites[0])
+	} else {
+		cSess.DTLSCipherSuite = "DTLS"
+	}
 
 	base.Info("dtls channel negotiation succeeded")
 
