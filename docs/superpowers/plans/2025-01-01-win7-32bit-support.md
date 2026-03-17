@@ -2,6 +2,40 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+---
+
+## Session Context (手动更新，2025-01-01)
+
+### 背景
+- `anylink-client` 当前处于 `win7-32bit` 分支；`sslcon` 已作为 git 子模块挂载于 `3rdparty/sslcon`，跟踪 `sslcon` 仓库的 `win7-32bit` 分支。
+- `sslcon` 的 `win7-32bit` 分支已完成：Go 1.20 降级、依赖锁定、wintun-go 替换为官方 `golang.zx2c4.com/wintun`、amd64/arm64 DLL 内嵌。
+- 当前 `GOARCH=386` 编译失败原因：`tun/tun_windows.go` 调用 `ExtractWintunDLL()`，但 x86 对应的嵌入文件缺失。
+
+### 已完成工作
+- [x] 将 `sslcon` 作为子模块添加到 `anylink-client`（commit `cb62201`）
+- [x] 完成 brainstorming 全流程
+- [x] 编写设计文档（commit `a23573c`）：`docs/superpowers/specs/2025-01-01-win7-32bit-support-design.md`
+- [x] 编写本实现计划（commit `d38d9bc`）
+
+### 待完成工作（本 plan 全部 4 个 Task 均未开始）
+- Task 1：下载并验证 Wintun 0.14.1 x86 DLL → 放入 `tun/dll/wintun_386.dll`
+- Task 2：创建 `tun/wintun_embed_windows_386.go` → 验证 x86 编译 → 提交
+- Task 3：修改 `ci.yml` → 添加 386 编译验证（仅 `windows-latest`）→ 提交
+- Task 4：修改 `release.yml` → 添加 `windows-386` 矩阵条目 → 提交
+
+### 关键约束
+- **工作目录：** 所有命令在 `3rdparty/sslcon`（sslcon 模块根目录）下以 **PowerShell** 执行
+- **不修改任何业务逻辑文件**，只新增/修改文件如上所列
+- Wintun 0.14.1 x86 DLL 信息：
+  - 下载地址：`https://www.wintun.net/builds/wintun-0.14.1.zip`
+  - ZIP SHA256：`07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51`
+  - ZIP 内路径：`wintun/bin/x86/wintun.dll`
+  - 文件大小：**184,664 字节**
+- `ci.yml`：现有 `windows*` 分支需拆分为 `windows-latest`（含 386 验证）和 `windows*`（arm 等）两段
+- `release.yml`：`Build archive` 步骤的 `windows*` glob 已自动匹配 `windows-386`，无需改动
+
+---
+
 **Goal:** Add `GOOS=windows GOARCH=386` compile support to sslcon by embedding the official Wintun x86 DLL and wiring it into CI and release workflows.
 
 **Architecture:** Mirror the existing amd64/arm64 DLL-embedding pattern exactly. A new build-tag-guarded file `tun/wintun_embed_windows_386.go` provides `ExtractWintunDLL()` for the 386 target; no business logic files change. CI gains a 386 compile-verification step on `windows-latest`; release gains a `windows-386` matrix entry producing `sslcon-windows7-386.7z`.
