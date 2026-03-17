@@ -34,6 +34,12 @@ jobs:
         if [[ "${{ matrix.os }}" == ubuntu* ]]; then
           go build -trimpath -ldflags "-s -w" -o vpnagent vpnagent.go
           go build -trimpath -ldflags "-s -w" -o sslcon sslcon.go
+        elif [[ "${{ matrix.os }}" == windows-latest ]]; then
+          go build -trimpath -ldflags "-s -w" -o vpnagent.exe vpnagent.go
+          go build -trimpath -ldflags "-s -w" -o sslcon.exe sslcon.go
+          # Verify Windows x86 cross-compilation
+          GOOS=windows GOARCH=386 go build -trimpath -ldflags "-s -w" -o vpnagent_386.exe vpnagent.go
+          GOOS=windows GOARCH=386 go build -trimpath -ldflags "-s -w" -o sslcon_386.exe sslcon.go
         elif [[ "${{ matrix.os }}" == windows* ]]; then
           go build -trimpath -ldflags "-s -w" -o vpnagent.exe vpnagent.go
           go build -trimpath -ldflags "-s -w" -o sslcon.exe sslcon.go
