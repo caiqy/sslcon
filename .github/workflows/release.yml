@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [linux, linux-arm64, linux-armv7, linux-riscv64, linux-mipsle, windows, windows-arm64, macos-arm64]
+        build: [linux, linux-arm64, linux-armv7, linux-riscv64, linux-mipsle, windows, windows-386, windows-arm64, macos-arm64]
         include:
           - build: linux
             os: ubuntu-22.04
@@ -41,6 +41,10 @@ jobs:
             os: windows-2022
             go: '1.20'
             archive-name: sslcon-windows7-amd64.7z
+          - build: windows-386
+            os: windows-2022
+            go: '1.20'
+            archive-name: sslcon-windows7-386.7z
           - build: windows-arm64
             os: windows-11-arm
             go: '1.20'
@@ -77,6 +81,9 @@ jobs:
         elif [ "${{ matrix.build }}" = "linux-mipsle" ]; then
           GOARCH=mipsle go build -trimpath -ldflags "-s -w" -o vpnagent vpnagent.go
           GOARCH=mipsle go build -trimpath -ldflags "-s -w" -o sslcon sslcon.go
+        elif [ "${{ matrix.build }}" = "windows-386" ]; then
+          GOOS=windows GOARCH=386 go build -trimpath -ldflags "-s -w" -o vpnagent.exe vpnagent.go
+          GOOS=windows GOARCH=386 go build -trimpath -ldflags "-s -w" -o sslcon.exe sslcon.go
         elif [ "${{ matrix.build }}" = "windows" ]; then
           go build -trimpath -ldflags "-s -w" -o vpnagent.exe vpnagent.go
           go build -trimpath -ldflags "-s -w" -o sslcon.exe sslcon.go
