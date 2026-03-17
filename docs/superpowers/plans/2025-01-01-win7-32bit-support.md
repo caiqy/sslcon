@@ -30,7 +30,7 @@
   - 下载地址：`https://www.wintun.net/builds/wintun-0.14.1.zip`
   - ZIP SHA256：`07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51`
   - ZIP 内路径：`wintun/bin/x86/wintun.dll`
-  - 文件大小：**184,664 字节**
+  - 文件大小：**550,928 字节**
 - `ci.yml`：现有 `windows*` 分支需拆分为 `windows-latest`（含 386 验证）和 `windows*`（arm 等）两段
 - `release.yml`：`Build archive` 步骤的 `windows*` glob 已自动匹配 `windows-386`，无需改动
 
@@ -82,10 +82,10 @@
 
   ```powershell
   (Get-Item "wintun-extracted\wintun\bin\x86\wintun.dll").Length
-  # Expected: 184664
+  # Expected: 550928
   ```
 
-  If the size does not match 184,664 bytes, do not proceed.
+  If the size does not match 550,928 bytes, do not proceed.
 
 - [ ] **Step 5: Copy DLL to repository**
 
@@ -100,7 +100,7 @@
   # Expected:
   # Name             Length
   # ----             ------
-  # wintun_386.dll   184664
+  # wintun_386.dll   550928
   # wintun_amd64.dll 427552
   # wintun_arm64.dll 222488
   ```
@@ -211,9 +211,9 @@
 - [ ] **Step 4: Verify the 386 binary embeds the DLL (size check)**
 
   ```powershell
-  # The 386 binary must be larger than the DLL alone (184664 bytes)
+  # The 386 binary must be larger than the DLL alone (550928 bytes)
   (Get-Item vpnagent_386.exe).Length
-  # Expected: greater than 184664
+  # Expected: greater than 550928
   ```
 
 - [ ] **Step 5: Clean up temp build artifacts**
@@ -391,7 +391,7 @@
   # Expected:
   # Name             Length
   # ----             ------
-  # wintun_386.dll   184664
+  # wintun_386.dll   550928
   # wintun_amd64.dll 427552
   # wintun_arm64.dll 222488
   ```

@@ -78,7 +78,7 @@ Path inside ZIP: `wintun/bin/x86/wintun.dll`
 
 This is the only signed and officially supported distribution of Wintun x86. The version must match the existing `wintun_amd64.dll` and `wintun_arm64.dll` (both from Wintun 0.14.1).
 
-The implementer must verify the extracted `x86/wintun.dll` matches the known file size before committing: the Wintun 0.14.1 x86 DLL is **184,664 bytes**.
+The implementer must verify the extracted `x86/wintun.dll` matches the known file size before committing: the Wintun 0.14.1 x86 DLL is **550,928 bytes**.
 
 ---
 
@@ -199,7 +199,7 @@ elif [[ "${{ matrix.os }}" == windows* ]]; then
 | 2 | `GOOS=windows GOARCH=386 go build … sslcon.go` exits with code 0 | Run on Windows runner or observe CI green |
 | 3 | CI `ci.yml` passes on `windows-latest` with both amd64 and 386 build steps | GitHub Actions check |
 | 4 | `release.yml` produces `sslcon-windows7-386.7z` on workflow dispatch | Check Release assets |
-| 5 | `tun/dll/wintun_386.dll` is 184,664 bytes (Wintun 0.14.1 x86) | `ls -la tun/dll/` |
+| 5 | `tun/dll/wintun_386.dll` is 550,928 bytes (Wintun 0.14.1 x86) | `ls -la tun/dll/` |
 
 ## Post-implementation Manual Validation (out of scope for this spec)
 
